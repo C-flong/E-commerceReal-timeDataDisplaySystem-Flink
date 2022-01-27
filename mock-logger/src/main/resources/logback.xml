@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_HOME" value="/opt/module/mock-data/mock-log/logs"/>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+    appender
+        追加器，描述如何写入到文件中（写在哪，格式，文件的切分）
+        ConsoleAppender：追加到控制台
+        RollingFileAppender：滚动追加到文件
+
+    logger
+        控制器，描述如何选择追加器
+        注意：要是单独为某个类指定的时候，别忘了修改类的全限定名
+
+    日志级别
+        TRACE	[DEBUG INFO	WARN ERROR]	FATAL
+    -->
+
+    <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 将某一个包下日志单独打印日志 -->
+<!--    仅对该类进行配置-->
+    <logger name="stu.cfl.controller.LoggerController"
+            level="INFO" additivity="false">
+        <appender-ref ref="rollingFile"/>
+        <appender-ref ref="console"/>
+    </logger>
+
+    <root level="error" additivity="false">
+        <appender-ref ref="console"/>
+    </root>
+</configuration>
