@@ -59,7 +59,7 @@ public class CustomerDeserialization implements DebeziumDeserializationSchema<St
         result.put("tableName", tableName);
         result.put("before", beforeJson);
         result.put("after", afterJson);
-        result.put("operation", type);
+        result.put("type", type);
 
         // 输出数据
         collector.collect(result.toJSONString());

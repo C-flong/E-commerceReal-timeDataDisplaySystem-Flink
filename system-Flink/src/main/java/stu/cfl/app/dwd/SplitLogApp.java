@@ -1,21 +1,17 @@
 package stu.cfl.app.dwd;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.javafx.scene.traversal.TopMostTraversalEngine;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.runtime.state.filesystem.FsStateBackend;
-import org.apache.flink.streaming.api.CheckpointingMode;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 import stu.cfl.utils.KafkaUtil;
@@ -24,7 +20,7 @@ public class SplitLogApp {
     /**
      * 分流日志数据：页面数据、启动日志、曝光数据
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         /*
@@ -48,7 +44,8 @@ public class SplitLogApp {
         DataStreamSource<String> log = env.addSource(KafkaUtil.getKafkaConsumer(topic, groupId));
 
         // TODO: 将每行数据转化为JSON对象（脏数据放入侧输出流）
-        OutputTag<String> outPutTag = new OutputTag<String>("dirtyDataStream");
+        // 侧输出流对象声明 OutputTag<Tuple2<String, Long>> info = new OutputTag<Tuple2<String, Long>>("late-data"){};
+        OutputTag<String> outPutTag = new OutputTag<String>("dirtyDataStream"){};
 
         SingleOutputStreamOperator<JSONObject> jsonObjectDS = log.process(new ProcessFunction<String, JSONObject>() {
             @Override
@@ -96,12 +93,45 @@ public class SplitLogApp {
         });
 
         // TODO: 分流
+        OutputTag<String> startTag = new OutputTag<String>("start"){};
+        OutputTag<String> displayTag = new OutputTag<String>("display"){};
+
+        // 主流：页面日志
+        SingleOutputStreamOperator<String> pageStream = richMapStream.process(new ProcessFunction<JSONObject, String>() {
+
+            @Override
+            public void processElement(JSONObject value, Context ctx, Collector<String> out) throws Exception {
+                JSONObject start = value.getJSONObject("start");
+                if (start != null) {
+                    // 属于启动日志,放入start侧输出流
+                    ctx.output(startTag, value.toString());
+                } else {
+                    out.collect(value.toString());
+                    JSONArray displays = value.getJSONArray("displays");
+                    if (displays != null) {
+                        // 是曝光数据,炸裂后将页面id存入每个数据中，再放入侧输出流
+                        String page_id = value.getJSONObject("page").getString("page_id");
+                        for (int i = 0; i < displays.size(); i++) {
+                            JSONObject page = displays.getJSONObject(i);
+                            page.put("page_id", page_id);
+                            ctx.output(displayTag, page.toString());
+                        }
+                    }
+                }
+            }
+        });
 
         // TODO: 提取侧输出流
+        DataStream<String> startSideOutput = pageStream.getSideOutput(startTag);
+        DataStream<String> displaySideOutput = pageStream.getSideOutput(displayTag);
 
         // TODO: 将不同流存入kafka的不同主题中
+        pageStream.addSink(KafkaUtil.getFlinkKafkaProducer("DWD_PAGE_LOG"));
+        startSideOutput.addSink(KafkaUtil.getFlinkKafkaProducer("DWD_START_LOG"));
+        displaySideOutput.addSink(KafkaUtil.getFlinkKafkaProducer("DWD_DISPLAY_LOG"));
 
-
+        // TODO: 执行
+        env.execute("SplitLogApp");
 
 
 
