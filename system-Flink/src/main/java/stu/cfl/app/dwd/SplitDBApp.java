@@ -62,7 +62,7 @@ public class SplitDBApp {
                 .password("1234")
                 .databaseList("realtimeSystem")
                 .tableList("realtimeSystem.table_process")
-                .startupOptions(StartupOptions.initial())
+                .startupOptions(StartupOptions.latest())
                 .deserializer(new CustomerDeserialization())
                 .build();
 
