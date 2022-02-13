@@ -68,4 +68,20 @@ public class KafkaUtil {
          */
 
     }
+
+    public static String getKafkaDDL(String topic, String groupId) {
+        String withSql = "'connector' = 'kafka', " +
+                " 'topic' = '" +
+                topic +
+                "'," +
+                " 'properties.bootstrap.servers' = '" +
+                brokers +
+                "', " +
+                " 'properties.group.id' = '" +
+                groupId +
+                "', " +
+                " 'format' = 'json', " +
+                " 'scan.startup.mode' = 'latest-offset'	";
+        return withSql;
+    }
 }

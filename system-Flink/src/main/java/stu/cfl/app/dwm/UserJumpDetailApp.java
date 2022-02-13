@@ -61,7 +61,7 @@ public class UserJumpDetailApp {
         SingleOutputStreamOperator<JSONObject> parsedDS = mapDS.assignTimestampsAndWatermarks(
                 WatermarkStrategy
                         .<JSONObject>forBoundedOutOfOrderness(
-                                Duration.ofSeconds(2)
+                                Duration.ofSeconds(1)
                         ).withTimestampAssigner(
                         new SerializableTimestampAssigner<JSONObject>() {
                             @Override
@@ -79,7 +79,6 @@ public class UserJumpDetailApp {
                     public boolean filter(JSONObject value) throws Exception {
                         String lastPageId = value.getJSONObject("page").getString("last_page_id");
                         return lastPageId == null || lastPageId.length() <= 0;
-
                     }
                 })
                 .next("next")
@@ -88,10 +87,20 @@ public class UserJumpDetailApp {
                     public boolean filter(JSONObject value) throws Exception {
                         String lastPageId = value.getJSONObject("page").getString("last_page_id");
                         return lastPageId == null || lastPageId.length() <= 0;
-
                     }
-                }).within(Time.seconds(10));
-
+                })
+                .within(Time.seconds(10));
+//        Pattern.<JSONObject>begin("start")
+//                .where(new SimpleCondition<JSONObject>() {
+//                    @Override
+//                    public boolean filter(JSONObject value) throws Exception {
+//                        String lastPageId = value.getJSONObject("page").getString("last_page_id");
+//                        return lastPageId == null || lastPageId.length() <= 0;
+//                    }
+//                })
+//                .times(2)
+//                .consecutive()
+//                .within(Time.seconds(10));
         // TODO: 将模式序列作用在流上
         PatternStream<JSONObject> patternDS = CEP.pattern(
                 // 应该将模式作用于不同用户，因此需要做分组
