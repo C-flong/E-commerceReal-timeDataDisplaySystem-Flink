@@ -21,11 +21,11 @@ import stu.cfl.utils.KafkaUtil;
 
 import java.time.Duration;
 import java.util.Date;
-
+/**
+ * 访客主题宽表计算
+ * 统计访客pv（页面访问数）、uv（首次访问数）、跳出数、进入页面数、连续访问时长
+ */
 public class VisitorStatsApp {
-    /**
-     * 访客主题宽表计算访客主题宽表计算
-     */
 
     public static void main(String[] args) throws Exception {
 
@@ -154,7 +154,6 @@ public class VisitorStatsApp {
                         stats1.setSv_ct(stats1.getSv_ct() + stats2.getSv_ct());
                         stats1.setDur_sum(stats1.getDur_sum() + stats2.getDur_sum());
                         return stats1;
-
                     }
                 },
                 new WindowFunction<VisitorStats, VisitorStats, Tuple4<String, String, String, String>, TimeWindow>() {

@@ -18,7 +18,8 @@ import stu.cfl.utils.KafkaUtil;
 
 public class SplitLogApp {
     /**
-     * 分流日志数据：页面数据、启动日志、曝光数据
+     * 分流日志数据：页面日志、启动日志、曝光日志
+     * 页面日志输出到主流,启动日志输出到启动侧输出流,曝光日志输出到曝光日志侧输出流
      */
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -60,8 +61,8 @@ public class SplitLogApp {
 
         });
 
-        // TODO: 验证新老用户（状态编程）
-        // 按照mid分组 KeyedStream<T, KEY>
+        // TODO: 验证新老访客（状态编程）
+        // 按照mid（设备id）分组 KeyedStream<T, KEY>
         KeyedStream<JSONObject, String> keyedStream = jsonObjectDS.keyBy(data -> data.getJSONObject("common").getString("mid"));
 
         SingleOutputStreamOperator<JSONObject> richMapStream = keyedStream.map(new RichMapFunction<JSONObject, JSONObject>() {

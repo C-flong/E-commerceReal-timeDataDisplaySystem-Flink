@@ -3,8 +3,6 @@ package stu.cfl.app.dwm;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
-import org.apache.flink.api.common.eventtime.WatermarkGenerator;
-import org.apache.flink.api.common.eventtime.WatermarkGeneratorSupplier;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.cep.CEP;
 import org.apache.flink.cep.PatternSelectFunction;
@@ -24,13 +22,13 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 跳出明细计算
+ * 跳出就是用户成功访问了网站的一个页面后就退出，不在继续访问网站的其它页面。而跳出率就是用跳出次数除以访问次数。
+ * 关注跳出率，可以看出引流过来的访客是否能很快的被吸引，渠道引流过来的用户之间的质量对比，对于应用优化前后跳出率的对比也能看出优化改进的成果。
+ */
 public class UserJumpDetailApp {
-    /**
-     * 跳出明细计算
-     * 跳出就是用户成功访问了网站的一个页面后就退出，不在继续访问网站的其它页面。而跳出率就是用跳出次数除以访问次数。
-     * 关注跳出率，可以看出引流过来的访客是否能很快的被吸引，渠道引流过来的用户之间的质量对比，对于应用优化前后跳出率的对比也能看出优化改进的成果。
-     * @param args
-     */
+
     public static void main(String[] args) throws Exception {
         // TODO: 环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();

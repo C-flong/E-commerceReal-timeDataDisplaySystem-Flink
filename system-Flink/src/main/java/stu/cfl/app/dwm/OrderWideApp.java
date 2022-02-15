@@ -13,16 +13,15 @@ import stu.cfl.app.function.DimAsyncFunction;
 import stu.cfl.bean.OrderDetail;
 import stu.cfl.bean.OrderInfo;
 import stu.cfl.bean.OrderWide;
-import stu.cfl.common.DBConfig;
-import stu.cfl.utils.DimUtil;
 import stu.cfl.utils.KafkaUtil;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 订单宽表，订单信息加细节并关联用户、地区、商品、品类、品牌
+ */
 public class OrderWideApp {
     public static void main(String[] args) throws Exception {
 
@@ -45,8 +44,8 @@ public class OrderWideApp {
         */
 
         // TODO: 从kafka中获取数据 ---> 转为JavaBean ---> 提取事件事件生成watermark
-        String orderInfoSourceTopic = "DWD_ORDER_INFO";
-        String orderDetailSourceTopic = "DWD_ORDER_DETAIL";
+        String orderInfoSourceTopic = "dwd_order_info";
+        String orderDetailSourceTopic = "dwd_order_detail";
         String orderWideSinkTopic = "DWM_ORDER_WIDE";
         String groupId = "OrderWideApp";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

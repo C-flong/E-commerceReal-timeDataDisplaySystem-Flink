@@ -3,18 +3,17 @@ package stu.cfl.app.dws;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
-import org.apache.flink.table.api.TableResult;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import stu.cfl.app.function.KeywordUDTF;
 import stu.cfl.bean.KeywordStats;
 import stu.cfl.common.Constant;
 import stu.cfl.utils.ClickHouseUtil;
 import stu.cfl.utils.KafkaUtil;
-
+/**
+ * 词频统计(搜索词)
+ */
 public class KeywordsStatSQLApp {
-    /**
-     * 词频统计
-     */
+
     public static void main(String[] args) throws Exception {
         // TODO 环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();

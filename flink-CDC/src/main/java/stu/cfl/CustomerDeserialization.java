@@ -11,6 +11,9 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 
+/**
+ * 自定义反序列化程序，
+ */
 public class CustomerDeserialization implements DebeziumDeserializationSchema<String> {
 
     @Override

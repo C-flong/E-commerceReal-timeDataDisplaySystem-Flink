@@ -5,24 +5,19 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.api.common.state.*;
 import org.apache.flink.api.common.time.Time;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import stu.cfl.utils.KafkaUtil;
-
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 
+/**
+ * UV计算，可用于统计日活
+ */
 public class UniqueVisitApp {
-    /**
-     * UV计算，可用于统计日活
-     */
+
     public static void main(String[] args) throws Exception {
         // TODO: 环境设置
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();

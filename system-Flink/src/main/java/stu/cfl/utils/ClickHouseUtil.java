@@ -13,6 +13,9 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * 自定义写入ClickHouse工具类
+ */
 public class ClickHouseUtil {
 
     public static <T> SinkFunction<T> getSink(String sql){

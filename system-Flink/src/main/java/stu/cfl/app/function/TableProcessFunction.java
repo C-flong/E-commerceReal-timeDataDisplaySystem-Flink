@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
+/**
+ * 合并主流和广播流，综合信息后并进行分流
+ */
 public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, String, JSONObject> {
-    /**
-     * 合并主流和广播流，综合信息后并进行分流
-     */
+
     private Connection connection;
     private OutputTag<JSONObject> tagHBase;
     private MapStateDescriptor<String, TableProcess> mapStateDescriptor;

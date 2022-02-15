@@ -1,9 +1,9 @@
 package stu.cfl.common;
-
+/**
+ * 电商业务常量
+ */
 public class Constant {
-    /**
-     * 电商业务常量
-     */
+
     // 10 单据状态
     public static final String ORDER_STATUS_UNPAID="1001";  // 未支付
     public static final String ORDER_STATUS_PAID="1002";  // 已支付

@@ -32,11 +32,11 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
-
+/**
+ * 商品主题宽表
+ * 点击、曝光、收藏、加入购物车、下单、支付、退款、评价
+ */
 public class ProductStatsApp {
-    /**
-     * 商品主题宽表
-     */
 
     public static void main(String[] args) throws Exception {
 
@@ -63,10 +63,10 @@ public class ProductStatsApp {
         String pageViewSourceTopic = "DWD_PAGE_LOG";
         String orderWideSourceTopic = "DWM_ORDER_WIDE";
         String paymentWideSourceTopic = "DWM_PAYMENT_WIDE";
-        String cartInfoSourceTopic = "DWD_CART_INFO";
-        String favorInfoSourceTopic = "DWD_FAVOR_INFO";
-        String refundInfoSourceTopic = "DWD_ORDER_REFUND_INFO";
-        String commentInfoSourceTopic = "DWD_COMMENT_INFO";
+        String cartInfoSourceTopic = "dwd_cart_info";
+        String favorInfoSourceTopic = "dwd_favor_info";
+        String refundInfoSourceTopic = "dwd_order_refund_info";
+        String commentInfoSourceTopic = "dwd_comment_info";
 
         FlinkKafkaConsumer<String> pageViewSource = KafkaUtil.getKafkaConsumer(pageViewSourceTopic,groupId);
         FlinkKafkaConsumer<String> orderWideSource = KafkaUtil.getKafkaConsumer(orderWideSourceTopic,groupId);
@@ -150,8 +150,8 @@ public class ProductStatsApp {
             orderIds.add(orderWide.getOrder_id());
             return ProductStats.builder()
                     .sku_id(orderWide.getSku_id())
-                    .order_sku_num(orderWide.getSku_num())
-                    .order_amount(orderWide.getOrder_price())
+                    .order_sku_num(orderWide.getSku_num())  // 数量
+                    .order_amount(orderWide.getOrder_price())  // sku_id订单价格
                     .orderIdSet(orderIds)
                     .ts(DateTimeUtil.toTs(orderWide.getCreate_time()))
                     .build();
@@ -344,7 +344,7 @@ public class ProductStatsApp {
 
 
         // TODO 写入ClickHouse
-        String sql = "insert into product_stats_2021 values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "insert into product_stats values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         reduceDSWithTM.addSink(ClickHouseUtil.<ProductStats>getSink(sql));
 
         // TODO 执行

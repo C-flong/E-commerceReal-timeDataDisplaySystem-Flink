@@ -24,6 +24,4 @@ public class KeywordUDTF extends TableFunction<Row> {
             collect(Row.of(s));
         }
     }
-
-
 }

@@ -17,6 +17,10 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * 异步关联HBase数据
+ * @param <T>
+ */
 public abstract class DimAsyncFunction<T> extends RichAsyncFunction<T, T> {
 
     private Connection connection;

@@ -73,7 +73,6 @@ public class SplitDBApp {
                 String.class,
                 TableProcess.class
         );
-
         BroadcastStream<String> process = processTableStream.broadcast(mapStateDescriptor);
 
         // TODO: 2022/1/28 连接主流和广播流

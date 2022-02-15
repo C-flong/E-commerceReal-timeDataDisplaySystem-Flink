@@ -13,6 +13,9 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Set;
 
+/**
+ * 自定义下沉函数下沉至HBase
+ */
 public class DimSinkFunction extends RichSinkFunction<JSONObject> {
 
     private Connection connection;

@@ -9,6 +9,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import stu.cfl.app.function.CustomerDeserialization;
 import stu.cfl.utils.KafkaUtil;
 
+/**
+ * 通过FlinkCDC获取mysql的业务数据
+ */
 public class FlinkCDC {
 
     public static void main(String[] args) throws Exception {

@@ -8,11 +8,12 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import stu.cfl.bean.ProvinceStats;
 import stu.cfl.utils.ClickHouseUtil;
 import stu.cfl.utils.KafkaUtil;
-
+/**
+ * 地区主题宽表
+ * 地区主题主要是反映各个地区的销售情况
+ */
 public class ProvinceStatsSQLApp {
-    /**
-     * 地区主题表
-     */
+
     public static void main(String[] args) throws Exception {
         // TODO 环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();

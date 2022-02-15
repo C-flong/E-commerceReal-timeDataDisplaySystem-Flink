@@ -17,6 +17,10 @@ import stu.cfl.utils.KafkaUtil;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+/**
+ * 支付宽表：支付表没有到订单明细，支付金额没有细分到商品上， 没有办法统计商品级的支付状况。
+ * 所以本次宽表的核心就是要把支付表的信息与订单宽表关联上。
+ */
 public class PaymentWideApp {
     public static void main(String[] args) throws Exception {
 
@@ -40,7 +44,7 @@ public class PaymentWideApp {
 
         // TODO: 加载流
         String groupId = "PaymentWideApp";
-        String paymentInfoSourceTopic = "DWD_PAYMENT_INFO";
+        String paymentInfoSourceTopic = "dwd_payment_info";
         String orderWideSourceTopic = "DWM_ORDER_WIDE";
         String paymentWideSinkTopic = "DWM_PAYMENT_WIDE";
         SingleOutputStreamOperator<OrderWide> orderWideDS = env.addSource(KafkaUtil.getKafkaConsumer(orderWideSourceTopic, groupId))
