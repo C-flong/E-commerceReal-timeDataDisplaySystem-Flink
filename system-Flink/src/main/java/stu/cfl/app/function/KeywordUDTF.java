@@ -9,7 +9,7 @@ import stu.cfl.utils.KeywordUtil;
 
 import java.util.List;
 
-@FunctionHint(output = @DataTypeHint("ROW<s STRING>"))
+@FunctionHint(output = @DataTypeHint("ROW<word STRING>"))
 public class KeywordUDTF extends TableFunction<Row> {
     /**
      * 分词UDTF函数

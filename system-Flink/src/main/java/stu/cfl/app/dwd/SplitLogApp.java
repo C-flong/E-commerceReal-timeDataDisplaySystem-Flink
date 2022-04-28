@@ -6,6 +6,7 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -66,23 +67,32 @@ public class SplitLogApp {
         KeyedStream<JSONObject, String> keyedStream = jsonObjectDS.keyBy(data -> data.getJSONObject("common").getString("mid"));
 
         SingleOutputStreamOperator<JSONObject> richMapStream = keyedStream.map(new RichMapFunction<JSONObject, JSONObject>() {
-            private ValueState<String> midState;
+            private ValueState<Integer> midState;
 
             @Override
             public void open(Configuration parameters) throws Exception {
-                this.midState = getRuntimeContext().getState(new ValueStateDescriptor<String>("midState", String.class));
+                this.midState = getRuntimeContext().getState(new ValueStateDescriptor<Integer>("midState", Integer.class));
             }
 
             @Override
             public JSONObject map(JSONObject value) throws Exception {
                 String is_new = value.getJSONObject("common").getString("is_new");
-                if (is_new.equals("1")) {
+
+                if ("1".equals(is_new)) {
                     if (this.midState.value() != null) {
-                        value.getJSONObject("common").put("is_new", 0);  // is_new为错误信息
+                        if (this.midState.value() >= 2){
+                            value.getJSONObject("common").put("is_new", "0");  // is_new为错误信息
+                        }
+                        else{
+                            this.midState.update(2);
+                        }
                     } else {
-                        this.midState.update("1");  // 新用户
+//                        System.out.println(value);
+                        this.midState.update(1);  // 新用户
                     }
                 }
+
+
                 return value;
             }
 
@@ -92,7 +102,8 @@ public class SplitLogApp {
             }
 
         });
-
+//        richMapStream.writeAsText("D:\\WorkSpace\\IdeaProjects\\E-commerceReal-timeDataDisplaySystem-Flink\\system-Flink\\src\\main\\resources\\splitLog.json");
+//        richMapStream.print();
         // TODO: 分流
         OutputTag<String> startTag = new OutputTag<String>("start"){};
         OutputTag<String> displayTag = new OutputTag<String>("display"){};
@@ -131,6 +142,7 @@ public class SplitLogApp {
         startSideOutput.addSink(KafkaUtil.getFlinkKafkaProducer("DWD_START_LOG"));
         displaySideOutput.addSink(KafkaUtil.getFlinkKafkaProducer("DWD_DISPLAY_LOG"));
 
+//        pageStream.print();
         // TODO: 执行
         env.execute("SplitLogApp");
 

@@ -127,7 +127,7 @@ public class UserJumpDetailApp {
         DataStream<JSONObject> unionDS = selectDS.union(timeoutOutputDS);
 
         // TODO: 将数据写入kafka
-        unionDS.print();
+//        unionDS.print();
         unionDS.map(JSON::toString)
                 .addSink(KafkaUtil.getFlinkKafkaProducer(sinkTopic));
 

@@ -101,7 +101,7 @@ public class PaymentWideApp {
         // TODO: 写入kafka
         paymentWideDS.map(JSON::toJSONString)
                 .addSink(KafkaUtil.getFlinkKafkaProducer(paymentWideSinkTopic));
-
+//        paymentWideDS.print();
         // TODO: 执行
         env.execute("PaymentWideApp");
     }

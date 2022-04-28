@@ -52,15 +52,15 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
         // "type":"insert","tableName":"base_trademark"}
         JSONObject jsonObject = JSONObject.parseObject(value);
         // 删除table_process表数据的情况未考虑，目前先直接跳出
-        if (!jsonObject.getString("type").equals("insert"))
-            return;
+//        if (!jsonObject.getString("type").equals("insert"))
+//            return;
         String data = jsonObject.getString("after");
         TableProcess tableProcess = JSONObject.parseObject(data, TableProcess.class);
         PreparedStatement preparedStatement = null;
 
         // 校验是否存在对应的HBase表 (目前仅考虑了增加表的情况，删除表待考虑)
 
-        if(tableProcess.getSinkType().equals(TableProcess.SINK_TYPE_HBASE)){
+        if(TableProcess.SINK_TYPE_HBASE.equals(tableProcess.getSinkType())){
             try{
                 // 判断是否是写入hbase的数据
                 String sinkTable = tableProcess.getSinkTable();
@@ -119,6 +119,7 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
         // 写入状态，并广播
         BroadcastState<String, TableProcess> broadcastState = ctx.getBroadcastState(this.mapStateDescriptor);
         String key = tableProcess.getSourceTable() + "," + tableProcess.getOperateType();
+//        System.out.println(key);
         broadcastState.put(key, tableProcess);
     }
 
@@ -150,23 +151,24 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
             Set<Map.Entry<String, Object>> entries = data.entrySet();
             entries.removeIf(entry -> !columnsList.contains(entry.getKey()));
 
-            // 分流（kafka|hbase）
+            // 分流（kafka | hbase）
             String sinkTable = tableProcess.getSinkTable();
             // 添加下沉去处
             value.put("sinkTable", sinkTable);
             String sinkType = tableProcess.getSinkType();
             if (sinkType.equals(TableProcess.SINK_TYPE_HBASE)){
                 // 传入hbase的数据写出至侧输出流
-                System.out.println("hbase---" + value);
+//                System.out.println("hbase---" + value);
                 ctx.output(tagHBase, value);
             }
             else if (sinkType.equals(TableProcess.SINK_TYPE_KAFKA)){
                 // 传入kafka的数据写出至侧主流
-                System.out.println("kafka---" + value);
+//                System.out.println("kafka---" + value);
                 out.collect(value);
             }
 
         }else{
+//            System.out.println(key);
             System.out.println("无法定位该记录的去向！！！");
         }
 

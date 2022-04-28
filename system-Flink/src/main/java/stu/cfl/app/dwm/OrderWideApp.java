@@ -242,7 +242,7 @@ public class OrderWideApp {
                 60,
                 TimeUnit.SECONDS
         );
-
+//        orderWideDSWithCategory3.print();
         // TODO: 写入kafka
         orderWideDSWithCategory3
                 .map(JSONObject::toJSONString)

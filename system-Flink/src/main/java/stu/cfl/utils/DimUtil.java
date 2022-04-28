@@ -25,7 +25,8 @@ public class DimUtil {
                 + "'"
                 + id
                 + "'";
-        List<JSONObject> query = JDBCUtil.query(connection, sql, JSONObject.class, true);
+
+        List<JSONObject> query = JDBCUtil.query(connection, sql, JSONObject.class, false);
         return query.get(0);
     }
 }

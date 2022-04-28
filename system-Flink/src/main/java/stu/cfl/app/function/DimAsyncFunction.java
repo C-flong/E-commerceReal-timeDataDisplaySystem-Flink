@@ -73,7 +73,9 @@ public abstract class DimAsyncFunction<T> extends RichAsyncFunction<T, T> {
     public abstract String getId(T input);
 
     @Override
-    public void timeout(T input, ResultFuture<T> resultFuture) throws Exception {
-        super.timeout(input, resultFuture);
+    public void timeout(T input, ResultFuture<T> resultFuture) {
+        System.out.println("处理失败：" + input);
+//        return;
+//        super.timeout(input, resultFuture);
     }
 }

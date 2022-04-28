@@ -4,6 +4,7 @@ package stu.cfl.app.ods;
 import com.alibaba.ververica.cdc.connectors.mysql.MySQLSource;
 import com.alibaba.ververica.cdc.connectors.mysql.table.StartupOptions;
 import com.alibaba.ververica.cdc.debezium.DebeziumSourceFunction;
+import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import stu.cfl.app.function.CustomerDeserialization;
@@ -53,7 +54,8 @@ public class FlinkCDC {
         DataStreamSource<String> streamSource = env.addSource(sourceFunction);
 
         // 3、将数据写入kafka
-        streamSource.print();
+//        streamSource.print();
+
         String topic = "ODS_BASE_DB";
         streamSource.addSink(KafkaUtil.getFlinkKafkaProducer(topic));
 

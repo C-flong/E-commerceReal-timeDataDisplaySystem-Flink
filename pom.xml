@@ -12,6 +12,8 @@
         <module>mock-logger</module>
         <module>flink-CDC</module>
         <module>system-Flink</module>
+        <module>data-server</module>
+<!--        <module>mock-log</module>-->
     </modules>
 
     <properties>

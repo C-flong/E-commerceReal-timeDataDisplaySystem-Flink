@@ -151,7 +151,8 @@ public class ProductStatsApp {
             return ProductStats.builder()
                     .sku_id(orderWide.getSku_id())
                     .order_sku_num(orderWide.getSku_num())  // 数量
-                    .order_amount(orderWide.getOrder_price())  // sku_id订单价格
+//                    .order_amount(orderWide.getOrder_price())  // sku_id订单价格
+                    .order_amount(orderWide.getTotal_amount())  // sku_id订单价格
                     .orderIdSet(orderIds)
                     .ts(DateTimeUtil.toTs(orderWide.getCreate_time()))
                     .build();
@@ -163,7 +164,8 @@ public class ProductStatsApp {
             orderIds.add(paymentWide.getOrder_id());
             return ProductStats.builder()
                     .sku_id(paymentWide.getSku_id())
-                    .payment_amount(paymentWide.getOrder_price())
+//                    .payment_amount(paymentWide.getOrder_price())
+                    .payment_amount(paymentWide.getSplit_total_amount())
                     .paidOrderIdSet(orderIds)
                     .ts(DateTimeUtil.toTs(paymentWide.getPayment_create_time()))
                     .build();
@@ -220,7 +222,8 @@ public class ProductStatsApp {
         );
 
         // TODO 分组，开窗，聚合 按照sku_id分组，10秒的滚动窗口，结合增量聚合（累加值）和全量聚合（提取窗口信息）
-        SingleOutputStreamOperator<ProductStats> reduceDS = DSWithWM.keyBy(ProductStats::getSku_id)
+        SingleOutputStreamOperator<ProductStats> filterDS = DSWithWM.filter(data -> data.getSku_id() != null);
+        SingleOutputStreamOperator<ProductStats> reduceDS = filterDS.keyBy(ProductStats::getSku_id)
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
                 .reduce(
                         new ReduceFunction<ProductStats>() {
@@ -267,6 +270,8 @@ public class ProductStatsApp {
                             }
                         }
                 );
+
+//        reduceDS.print();
 
         // TODO 关联维度信息
         // SKU
@@ -342,7 +347,7 @@ public class ProductStatsApp {
                 TimeUnit.SECONDS
         );
 
-
+//        reduceDSWithTM.print();
         // TODO 写入ClickHouse
         String sql = "insert into product_stats values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         reduceDSWithTM.addSink(ClickHouseUtil.<ProductStats>getSink(sql));

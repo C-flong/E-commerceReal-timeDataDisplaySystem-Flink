@@ -19,7 +19,17 @@ public class DateTimeUtil {
     }
 
     public static Long toTs(String YmDHms) {
-        LocalDateTime localDateTime = LocalDateTime.parse(YmDHms, formatterr);
+        if(YmDHms == null){
+            return 0L;
+        }
+        LocalDateTime localDateTime = null;
+        try{
+            localDateTime = LocalDateTime.parse(YmDHms, formatterr);
+        }catch (Exception e){
+            System.out.println(YmDHms);
+            String timestamp2 = YmDHms.replace('-', '/');   //为了兼容IOS，需先将字符串转换为'2018/9/11 9:11:23'
+            return Date.parse(timestamp2);
+        }
 
         return localDateTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
     }

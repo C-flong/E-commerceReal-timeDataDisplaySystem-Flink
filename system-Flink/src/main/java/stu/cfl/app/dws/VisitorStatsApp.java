@@ -176,7 +176,7 @@ public class VisitorStatsApp {
         );
 
         // TODO: 将数据写入clickhouse
-        reduceDS.print();
+//        reduceDS.print();
         String sql = "insert into visitor_stats values(?,?,?,?,?,?,?,?,?,?,?,?)";
         reduceDS.addSink(ClickHouseUtil.getSink(sql));
 

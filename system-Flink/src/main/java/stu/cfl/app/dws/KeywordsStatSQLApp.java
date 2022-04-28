@@ -39,11 +39,11 @@ public class KeywordsStatSQLApp {
         String pageViewSourceTopic ="DWD_PAGE_LOG";
 
         String sql1 = "CREATE TABLE page_view(" +
-                "common MAP<STRING,STRING>," +
-                "page MAP<STRING,STRING>," +
+                "common Map<STRING,STRING>," +
+                "page Map<STRING,STRING>," +
                 "ts BIGINT, " +
-                "rowtime AS TO_TIMESTAMP(FROM_UNIXTIME(ts/1000, 'yyyy-MM-dd HH:mm:ss'))," +
-                "WATERMARK FOR rowtime AS rowtime - INTERVAL '1' SECOND" +
+                "rt AS TO_TIMESTAMP(FROM_UNIXTIME(ts/1000, 'yyyy-MM-dd HH:mm:ss'))," +
+                "WATERMARK FOR rt AS rt - INTERVAL '1' SECOND" +
                 ") " +
                 "WITH (" +
                 KafkaUtil.getKafkaDDL(pageViewSourceTopic,groupId) +
@@ -53,11 +53,11 @@ public class KeywordsStatSQLApp {
 
         // TODO 过滤 上一跳页面为“search” && 搜索词！=null
         String sql2 = "select " +
-                    "page['item'] full_word," +
-                    "rt" +
-                "from page_view" +
+                    "page['item'] full_word, " +
+                    "rt " +
+                "from page_view " +
                 "where " +
-                    "page['page_id']='good_list' and " +
+                    "page['last_page_id']='search' and " +
                     "page['item'] IS NOT NULL ";
         Table tableResult = tableEnv.sqlQuery(sql2);
 
@@ -66,17 +66,16 @@ public class KeywordsStatSQLApp {
         Table wordTable = tableEnv.sqlQuery("select " +
                 "word, rt from " +
                 tableResult +  // 还可创建一个视图
-                " ," +
-                " LATERAL TABLE(splitWord(full_word))");
+                ", LATERAL TABLE(splitWord(full_word))");
 
         // TODO 分组，开窗，聚合
         String sql3 = "select " +
-                "word keyword," +
+                "word keyword, " +
                 "count(*) ct, " +
-                "'" + Constant.KEYWORD_SEARCH + "' source ," +  // 关键词来源（搜索search）
-                "DATE_FORMAT(TUMBLE_START(rt, INTERVAL '10' SECOND),'yyyy-MM-dd HH:mm:ss') stt," +
-                "DATE_FORMAT(TUMBLE_END(rt, INTERVAL '10' SECOND),'yyyy-MM-dd HH:mm:ss') edt," +
-                "UNIX_TIMESTAMP()*1000 ts from  "+
+                "'" + Constant.KEYWORD_SEARCH + "' source , " +  // 关键词来源（搜索search）
+                "DATE_FORMAT(TUMBLE_START(rt, INTERVAL '10' SECOND),'yyyy-MM-dd HH:mm:ss') stt, " +
+                "DATE_FORMAT(TUMBLE_END(rt, INTERVAL '10' SECOND),'yyyy-MM-dd HH:mm:ss') edt, " +
+                "UNIX_TIMESTAMP()*1000 ts from "+
                 wordTable +
                 " GROUP BY TUMBLE(rt, INTERVAL '10' SECOND ), word";
         Table result = tableEnv.sqlQuery(sql3);
@@ -85,7 +84,7 @@ public class KeywordsStatSQLApp {
         DataStream<KeywordStats> keywordStatsDataStream = tableEnv.toAppendStream(result, KeywordStats.class);
 
         // TODO 写入ClickHouse
-        keywordStatsDataStream.print();
+//        keywordStatsDataStream.print();
         String sql = "insert into keyword_stats(keyword,ct,source,stt,edt,ts) " + " values(?,?,?,?,?,?)";
         keywordStatsDataStream.<KeywordStats>addSink(ClickHouseUtil.getSink(sql));
 

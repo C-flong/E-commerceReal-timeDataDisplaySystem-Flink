@@ -38,22 +38,19 @@ public class ProvinceStatsSQLApp {
         String groupId = "ProvinceStatsSQLApp";
         String orderWideTopic = "DWM_ORDER_WIDE";
 
-        String sql1 = "CREATE TABLE order_wide (" +
-                "province_id BIGINT, " +
-                "province_name STRING, " +
-                "province_area_code STRING, " +
-                "province_iso_code STRING, " +
-                "province_3166_2_code STRING, " +
-                "order_id STRING, " +
-                "total_amount DOUBLE, " +
-                "create_time STRING, " +
-                // 创建水位线
-                "rowtime AS TO_TIMESTAMP(create_time), " +
-                "WATERMARK FOR rowtime AS rowtime - INTERVAL '1' SECOND)" +
-                " WITH (" +
+        String sql1 = "CREATE TABLE order_wide ( " +
+                "  `province_id` BIGINT, " +
+                "  `province_name` STRING, " +
+                "  `province_area_code` STRING, " +
+                "  `province_iso_code` STRING, " +
+                "  `province_3166_2_code` STRING, " +
+                "  `order_id` BIGINT, " +
+                "  `split_total_amount` DECIMAL, " +
+                "  `create_time` STRING, " +
+                "  `rowtime` as TO_TIMESTAMP(create_time), " +
+                "  WATERMARK FOR rowtime AS rowtime - INTERVAL '1' SECOND ) with(" +
                 KafkaUtil.getKafkaDDL(orderWideTopic, groupId) +
                 ")";
-
         tableEnv.executeSql(sql1);
 
         // TODO 查询（分组，开窗，聚合）
@@ -66,9 +63,10 @@ public class ProvinceStatsSQLApp {
                 "province_iso_code, " +
                 "province_3166_2_code, " +
                 "count( DISTINCT order_id) order_count, " +
-                "sum(total_amount) order_amount, " +
+                "sum(split_total_amount) order_amount, " +
                 "UNIX_TIMESTAMP()*1000 ts " +
-                "from order_wide " +
+                "from " +
+                    "order_wide " +
                 "group by " +
                     "TUMBLE(rowtime, INTERVAL '10' SECOND )," +
                     "province_id," +
@@ -83,7 +81,7 @@ public class ProvinceStatsSQLApp {
         DataStream<ProvinceStats> provinceStatsDS = tableEnv.toAppendStream(table, ProvinceStats.class);
 
         // TODO 写入ClickHouse
-        provinceStatsDS.print();
+//        provinceStatsDS.print();
         String sql3 = "insert into	province_stats values(?,?,?,?,?,?,?,?,?,?)";
         provinceStatsDS.addSink(ClickHouseUtil.getSink(sql3));
 

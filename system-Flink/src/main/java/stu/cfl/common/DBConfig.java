@@ -2,7 +2,7 @@ package stu.cfl.common;
 import org.apache.phoenix.jdbc.PhoenixDriver;
 public class DBConfig {
     // HBase库名
-    public static final String HBASE_SCHEMA = "realtimeSystem";
+    public static final String HBASE_SCHEMA = "REALTIMESYSTEM";
 
     // Phoenix驱动
     public static final String PHOENIX_DRIVER = "org.apache.phoenix.jdbc.PhoenixDriver";

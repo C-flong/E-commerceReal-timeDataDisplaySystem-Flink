@@ -56,6 +56,7 @@ public class UniqueVisitApp {
         // }
         // data: {column1: "", column2: "", column3: "", ...}
 
+        // 此处根据mid即设备id分组，因为日活用户不仅包含了登录用户还包括未登录的游客用户，且数据来源是埋点的用户行为日志
         KeyedStream<JSONObject, String> keyedStream = mapDS.keyBy(data -> data.getJSONObject("common").getString("mid"));
 //        KeyedStream<JSONObject, String> keyedStream = mapDS.keyBy(new KeySelector<JSONObject, String>() {
 //            @Override
@@ -98,7 +99,7 @@ public class UniqueVisitApp {
         });
 
         // TODO: 写入kafka
-        filterDS.print();
+//        filterDS.print();
         filterDS.map(JSON::toString)
                 .addSink(KafkaUtil.getFlinkKafkaProducer(sinkTopic));
 
